@@ -28,16 +28,22 @@ public final class Engine {
     }
 
     public static void run() {
+        long lastTime = System.nanoTime(), now;
+
         while (!window.shouldClose()) {
             window.clear();
 
-            scene.update();
+            now  = System.nanoTime();
+
+            scene.update((now - lastTime) / 1_000_000_000.f);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scene.render();
 
             window.swapBuffers();
             window.pollEvents();
+
+            lastTime = now;
         }
 
         cleanUp();

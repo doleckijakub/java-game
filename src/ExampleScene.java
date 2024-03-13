@@ -1,6 +1,6 @@
 import engine.*;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL20.*;
 
 public class ExampleScene extends Scene {
@@ -23,8 +23,8 @@ public class ExampleScene extends Scene {
         }
     }
 
-    final VertexArray vao;
-    private final int scaleId;
+    private final Shader shader;
+    private final VertexArray vao;
 
     public ExampleScene() {
         Vertex3p3c[] vertices = new Vertex3p3c[] {
@@ -42,11 +42,11 @@ public class ExampleScene extends Scene {
                 5, 4, 1,
         };
 
-        Shader shader = new Shader("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
-        shader.bind();
+        this.shader = new Shader("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
+        this.shader.bind();
 
         this.vao = new VertexArray();
-        vao.bind();
+        this.vao.bind();
 
         VertexBuffer<Vertex3p3c> vbo = new VertexBuffer<>(vertices);
         vbo.bind();
@@ -56,21 +56,25 @@ public class ExampleScene extends Scene {
 
         vao.linkAttrib(vbo, 0, 3, GL_FLOAT, false, 6 * 4, 0);
         vao.linkAttrib(vbo, 1, 3, GL_FLOAT, false, 6 * 4, 3 * 4);
-
-        this.scaleId = glGetUniformLocation(shader.id, "scale");
     }
 
+    private float scale = 1.0f;
+
     @Override
-    public void update() {
+    public void update(float deltaTime) {
         if (Keyboard.isKeyPressed(GLFW_KEY_W)) {
-            Engine.setScene(new ExampleScene());
+            scale += deltaTime;
+        }
+
+        if (Keyboard.isKeyPressed(GLFW_KEY_S)) {
+            scale -= deltaTime;
         }
     }
 
     @Override
     public void render() {
         this.vao.bind();
-        glUniform1f(scaleId, 1.0f);
+        this.shader.setUniform("scale", scale);
         glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
     }
 

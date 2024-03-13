@@ -7,7 +7,7 @@ import static org.lwjgl.opengl.GL20.*;
 
 public class Shader implements AutoCloseable {
 
-    public final int id;
+    private final int id;
 
     public Shader(String vertFilename, String fragFilename) {
         try {
@@ -48,5 +48,13 @@ public class Shader implements AutoCloseable {
 
     public void bind() {
         glUseProgram(this.id);
+    }
+
+    private int getUniformLocation(String name) {
+        return glGetUniformLocation(id, name);
+    }
+
+    public void setUniform(String name, float v0) {
+        glUniform1f(getUniformLocation(name), v0);
     }
 }
